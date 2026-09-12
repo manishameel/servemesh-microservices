@@ -4,28 +4,40 @@ A microservices-based backend for a real-time service marketplace (like Urban Co
 
 ## Architecture
 
-React/Next.js (future)
-↓
-API Gateway (4000)
-↓
-┌────────┼────────┐
-↓ ↓ ↓
-Auth Booking Vendor
-Service Service Service
-↓ ↓ ↓
-auth-db booking-db vendor-db
-(Postgres)(Postgres)(Postgres)
-↓
-Kafka
-↓
-┌────────┴────────┐
-↓ ↓
-Notification Analytics
-Service (planned)
-↓
-Redis Pub/Sub
-↓
-WebSocket Server ←→ Connected Clients
+```
+                          React / Next.js (future)
+                                    |
+                                    v
+                            API Gateway (:4000)
+                                    |
+              +---------------------+---------------------+
+              |                     |                     |
+              v                     v                     v
+        Auth Service          Booking Service       Vendor Service
+          (:4001)                (:4002)               (:4003)
+              |                     |                     |
+              v                     v                     v
+          auth-db              booking-db            vendor-db
+        (PostgreSQL)          (PostgreSQL)          (PostgreSQL)
+                                    |
+                                    v
+                                  Kafka
+                                    |
+                    +---------------+---------------+
+                    |                               |
+                    v                               v
+          Notification Service              Analytics Service
+               (:4004)                          (planned)
+                    |
+                    v
+              Redis Pub/Sub
+                    |
+                    v
+           WebSocket Server (:4005)
+                    |
+                    v
+             Connected Clients
+```
 
 
 ## Tech Stack
@@ -62,19 +74,21 @@ WebSocket Server ←→ Connected Clients
 ## Running Locally
 
 ```cmd
-git clone https://github.com/manishameel/servemesh-microservices.git
+git clone https://github.com/YOUR_USERNAME/servemesh-microservices.git
 cd servemesh-microservices
 docker-compose up --build
 ```
 
-Wait for all services to report "listening on port..." then verify health checks:
-http://localhost:4000/health
-http://localhost:4001/health
-http://localhost:4002/health
-http://localhost:4003/health
-http://localhost:4004/health
-http://localhost:4005/health
+Wait for all services to report `listening on port...`, then verify each health check:
 
+| Service | Health Check URL |
+|---|---|
+| API Gateway | http://localhost:4000/health |
+| Auth Service | http://localhost:4001/health |
+| Booking Service | http://localhost:4002/health |
+| Vendor Service | http://localhost:4003/health |
+| Notification Service | http://localhost:4004/health |
+| WebSocket Server | http://localhost:4005/health |
 
 A Postman collection with example requests is included in `/postman`.
 
