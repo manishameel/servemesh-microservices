@@ -51,6 +51,10 @@
         log(`<b>User ${data.senderId} (${data.senderRole}):</b> ${data.text}`);
       });
 
+      socket.on('booking_status_update', (booking) => {
+        log(`<b>🔔 Booking Update:</b> Booking #${booking.id} is now "${booking.status}"`);
+      });
+
       socket.on('connect_error', (err) => {
         log(`Connection error: ${err.message}`);
       });

@@ -28,6 +28,11 @@ async function setupRedis() {
     io.to(data.room).emit('receive_message', data);
   });
 
+  await subscriber.subscribe('booking-status-updates', (rawMessage) => {
+    const data = JSON.parse(rawMessage);
+    io.to(`user-${data.userId}`).emit('booking_status_update', data.booking);
+  });
+
   console.log('Redis pub/sub connected');
 }
 
@@ -45,6 +50,7 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
+  socket.join(`user-${socket.user.id}`);
   console.log(`User connected: id=${socket.user.id}, role=${socket.user.role}`);
 
   socket.on('join_room', (room) => {

@@ -1,6 +1,9 @@
 const express = require('express');
 const { Kafka } = require('kafkajs');
 require('dotenv').config();
+const { createClient } = require('redis');
+
+const redisPublisher = createClient({ url: process.env.REDIS_URL });
 
 const app = express();
 const PORT = process.env.PORT || 4004;
@@ -17,6 +20,7 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'notification-group' });
 
 async function startConsumer() {
+  await redisPublisher.connect();
   await consumer.connect();
   await consumer.subscribe({ topic: 'booking-events', fromBeginning: false });
 
@@ -29,7 +33,11 @@ async function startConsumer() {
       }
 
       if (event.type === 'BookingStatusUpdated') {
-        console.log(`📩 [Notification] Booking #${event.booking.id} status updated to "${event.booking.status}" — notifying user.`);
+        console.log(`[Notification] Booking #${event.booking.id} status updated to "${event.booking.status}" — notifying user.`);
+        await redisPublisher.publish('booking-status-updates', JSON.stringify({
+          userId: event.booking.user_id,
+          booking: event.booking,
+        }));
       }
     },
   });
