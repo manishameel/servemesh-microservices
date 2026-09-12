@@ -1,0 +1,156 @@
+{
+  "info": {
+    "name": "ServeMesh",
+    "description": "API collection for ServeMesh microservices — all requests go through the API Gateway on port 4000.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manisha\",\n  \"email\": \"manisha@test.com\",\n  \"password\": \"test123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api", "auth", "signup"] }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manisha@test.com\",\n  \"password\": \"test123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Profile (Protected)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/profile", "host": ["{{baseUrl}}"], "path": ["api", "auth", "profile"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vendor",
+      "item": [
+        {
+          "name": "Register Vendor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_name\": \"Manisha AC Repair\",\n  \"category\": \"AC Repair\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/vendors/register", "host": ["{{baseUrl}}"], "path": ["api", "vendors", "register"] }
+          }
+        },
+        {
+          "name": "My Vendor Status",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vendors/my-status", "host": ["{{baseUrl}}"], "path": ["api", "vendors", "my-status"] }
+          }
+        },
+        {
+          "name": "Admin: View Pending Vendors",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vendors/pending", "host": ["{{baseUrl}}"], "path": ["api", "vendors", "pending"] }
+          }
+        },
+        {
+          "name": "Admin: Approve/Reject Vendor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/vendors/1/status", "host": ["{{baseUrl}}"], "path": ["api", "vendors", "1", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendor_id\": 1,\n  \"service_name\": \"AC Repair\",\n  \"scheduled_time\": \"2026-09-25T10:00:00\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings/bookings", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "bookings"] }
+          }
+        },
+        {
+          "name": "My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/bookings/bookings/mine", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "bookings", "mine"] }
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings/bookings/1/status", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "bookings", "1", "status"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        { "name": "API Gateway", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+        { "name": "Auth Service", "request": { "method": "GET", "url": "http://localhost:4001/health" } },
+        { "name": "Booking Service", "request": { "method": "GET", "url": "http://localhost:4002/health" } },
+        { "name": "Vendor Service", "request": { "method": "GET", "url": "http://localhost:4003/health" } },
+        { "name": "Notification Service", "request": { "method": "GET", "url": "http://localhost:4004/health" } },
+        { "name": "WebSocket Server", "request": { "method": "GET", "url": "http://localhost:4005/health" } }
+      ]
+    }
+  ]
+}
