@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ServeMesh Chat Test</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>ServeMesh Chat Test</h2>
+
+  <div>
+    <label>JWT Token:</label><br>
+    <textarea id="token" rows="3" cols="60"></textarea>
+  </div>
+
+  <div>
+    <label>Room (e.g. booking-1):</label>
+    <input id="room" value="booking-1">
+    <button onclick="connect()">Connect & Join</button>
+  </div>
+
+  <div>
+    <input id="message" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <div id="log" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto;"></div>
+
+  <script>
+    let socket;
+
+    function log(text) {
+      const div = document.getElementById('log');
+      div.innerHTML += `<p>${text}</p>`;
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function connect() {
+      const token = document.getElementById('token').value;
+      const room = document.getElementById('room').value;
+
+      socket = io('http://localhost:4005', {
+        auth: { token }
+      });
+
+      socket.on('connect', () => {
+        log('Connected to server');
+        socket.emit('join_room', room);
+      });
+
+      socket.on('receive_message', (data) => {
+        log(`<b>User ${data.senderId} (${data.senderRole}):</b> ${data.text}`);
+      });
+
+      socket.on('connect_error', (err) => {
+        log(`Connection error: ${err.message}`);
+      });
+    }
+
+    function sendMessage() {
+      const room = document.getElementById('room').value;
+      const text = document.getElementById('message').value;
+      socket.emit('send_message', { room, text });
+      document.getElementById('message').value = '';
+    }
+  </script>
+</body>
+</html>
